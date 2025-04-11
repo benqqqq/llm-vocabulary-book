@@ -1,6 +1,7 @@
-import { Alert, CircularProgress, Paper } from '@mui/material'
+import VolumeUpIcon from '@mui/icons-material/VolumeUp'
+import { Alert, CircularProgress, IconButton, Paper, Tooltip } from '@mui/material'
 import type { ReactElement } from 'react'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { useOpenAI } from '../../services/OpenAiContext'
 import { useSettingContext } from '../../services/SettingContext'
@@ -31,7 +32,30 @@ export default function VocabularyDetail({
 	const [isLoading, setIsLoading] = useState(false)
 	const [detail, setDetail] = useState('')
 	const [error, setError] = useState<string | null>(null)
+	const [isPlaying, setIsPlaying] = useState(false)
 	const finishEvent = useMemo(() => new CustomEvent('finishEvent'), [])
+
+	const handlePronounce = useCallback(() => {
+		if (!vocabulary || isPlaying) return
+
+		setIsPlaying(true)
+		const utterance = new SpeechSynthesisUtterance(vocabulary.word)
+		
+		// Try to find a more natural-sounding voice
+		const voices = window.speechSynthesis.getVoices()
+		const naturalVoice = voices.find(voice => 
+			voice.lang === 'en-US' && voice.name.includes('Natural')
+		)
+
+		if (naturalVoice) {
+			utterance.voice = naturalVoice
+		}
+
+		utterance.lang = 'en-US'
+		utterance.onend = () => setIsPlaying(false)
+		utterance.onerror = () => setIsPlaying(false)
+		window.speechSynthesis.speak(utterance)
+	}, [vocabulary, isPlaying])
 
 	useEffect(() => {
 		if (!vocabulary) {
@@ -111,9 +135,21 @@ export default function VocabularyDetail({
 	return (
 		<div className="space-y-4">
 			<Paper elevation={0} className="p-6 bg-gray-50">
-				<h2 className="text-3xl font-bold text-gray-900 mb-2">
-					{vocabulary.word}
-				</h2>
+				<div className="flex items-center gap-2 mb-2">
+					<h2 className="text-3xl font-bold text-gray-900 m-0">
+						{vocabulary.word}
+					</h2>
+					<Tooltip title="Listen to pronunciation">
+						<IconButton
+							onClick={handlePronounce}
+							disabled={isPlaying}
+							size="small"
+							className="text-gray-600 hover:text-gray-900"
+						>
+							<VolumeUpIcon />
+						</IconButton>
+					</Tooltip>
+				</div>
 				{isLoading && (
 					<div className="flex items-center gap-2 text-gray-600">
 						<CircularProgress size={16} />
