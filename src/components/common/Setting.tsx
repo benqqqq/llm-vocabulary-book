@@ -62,65 +62,71 @@ export default function Setting(): ReactElement {
 
 	return (
 		<>
-			<Tooltip title="Open Settings">
-				<Button 
-					onClick={handleOpenDialog} 
+			<Tooltip title='Open Settings'>
+				<Button
+					onClick={handleOpenDialog}
 					startIcon={<SettingsIcon />}
-					variant="outlined"
-					size="small"
+					variant='outlined'
+					size='small'
 				>
 					Settings
 				</Button>
 			</Tooltip>
 
-			<Dialog open={isOpen} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
-				<DialogTitle>
-					Application Settings
-				</DialogTitle>
+			<Dialog open={isOpen} onClose={handleCloseDialog} maxWidth='sm' fullWidth>
+				<DialogTitle>Application Settings</DialogTitle>
 				<DialogContent>
-					<div className="mb-4">
-						<Typography variant="body2" className="mb-2">
+					<div className='mb-4'>
+						<Typography variant='body2' className='mb-2'>
 							To use this application, you need an OpenAI API key.
 							<Tooltip title="You can get an API key from OpenAI's website">
-								<IconButton size="small" href="https://platform.openai.com/api-keys" target="_blank">
-									<HelpOutlineIcon fontSize="small" />
+								<IconButton
+									size='small'
+									href='https://platform.openai.com/api-keys'
+									target='_blank'
+								>
+									<HelpOutlineIcon fontSize='small' />
 								</IconButton>
 							</Tooltip>
 						</Typography>
-						<Typography variant="body2" className="mb-4">
-							Don't have a key? <Link href="https://platform.openai.com/signup" target="_blank">Sign up at OpenAI</Link> to get one.
+						<Typography variant='body2' className='mb-4'>
+							Don&apos;t have a key?{' '}
+							<Link href='https://platform.openai.com/signup' target='_blank'>
+								Sign up at OpenAI
+							</Link>{' '}
+							to get one.
 						</Typography>
 					</div>
-					
+
 					<TextField
-						label="OpenAI API Key"
-						variant="outlined"
+						label='OpenAI API Key'
+						variant='outlined'
 						fullWidth
 						value={setting.openaiApiKey}
 						onChange={handleOnChange}
 						type={isShowKey ? 'text' : 'password'}
 						disabled={settingContext.isLoading}
-						placeholder="sk-..."
-						helperText="Your API key will be stored locally and never sent to any server other than OpenAI."
+						placeholder='sk-...'
+						helperText='Your API key will be stored locally and never sent to any server other than OpenAI.'
 					/>
-					
-					<FormGroup className="mt-2">
+
+					<FormGroup className='mt-2'>
 						<FormControlLabel
 							control={
 								<Checkbox checked={isShowKey} onChange={handleShowKeyClick} />
 							}
-							label="Show API key"
+							label='Show API key'
 						/>
 					</FormGroup>
 				</DialogContent>
 				<DialogActions>
 					<Button onClick={handleCloseDialog}>Cancel</Button>
 					<LoadingButton
-						variant="contained"
-						color="primary"
+						variant='contained'
+						color='primary'
 						onClick={handleSaveClick}
 						loading={settingContext.isLoading}
-						loadingIndicator="Saving..."
+						loadingIndicator='Saving...'
 					>
 						Save
 					</LoadingButton>

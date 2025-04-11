@@ -85,8 +85,8 @@ export function SettingProvider({
 			}
 
 			// Update local state immediately after database update
-			setSetting(prevSetting => ({
-				...prevSetting,
+			setSetting(previousSetting => ({
+				...previousSetting,
 				[settingKey]: value
 			}))
 

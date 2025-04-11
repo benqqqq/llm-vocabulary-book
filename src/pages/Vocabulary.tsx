@@ -5,7 +5,7 @@ import VocabularyDetail from '../components/Vocabulary/VocabularyDetail'
 import VocabularyInput from '../components/Vocabulary/VocabularyInput'
 import VocabularyList from '../components/Vocabulary/VocabularyList'
 import type { IVocabulary } from '../components/Vocabulary/types'
-import InstallPWA from '../components/common/InstallPWA'
+import InstallPwa from '../components/common/InstallPwa'
 import Setting from '../components/common/Setting'
 import { useSettingContext } from '../services/SettingContext'
 import { database } from '../storage/database'
@@ -32,7 +32,7 @@ export default function Vocabulary(): ReactElement {
 				setShowApiKeyAlert(true)
 				return
 			}
-			
+
 			const insertVocabularyListIntoDatabase = async (): Promise<void> => {
 				const existingVocabulary = vocabularyList.find(
 					vocabulary => vocabulary.word === text
@@ -134,32 +134,33 @@ export default function Vocabulary(): ReactElement {
 
 	return (
 		<div className='flex h-screen flex-col bg-gray-50'>
-			<div className='flex justify-between items-center p-4 bg-white border-b shadow-sm'>
-				<div className="flex items-center gap-2">
-					<h1 className='text-2xl font-bold text-gray-800'>LLM Vocabulary Book</h1>
-					<span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-full">{vocabularyList.length} words</span>
+			<div className='flex items-center justify-between border-b bg-white p-4 shadow-sm'>
+				<div className='flex items-center gap-2'>
+					<h1 className='text-2xl font-bold text-gray-800'>
+						LLM Vocabulary Book
+					</h1>
+					<span className='rounded-full bg-gray-100 px-2 py-1 text-sm text-gray-500'>
+						{vocabularyList.length} words
+					</span>
 				</div>
-				<div className="flex items-center gap-2">
-					<InstallPWA />
+				<div className='flex items-center gap-2'>
+					<InstallPwa />
 					<Setting />
 				</div>
 			</div>
-			
-			{showApiKeyAlert && (
+
+			{showApiKeyAlert ? (
 				<div className='mx-4 mt-4'>
-					<Alert 
-						severity="warning"
-						variant="outlined"
-						className='bg-white'
-					>
-						You need to set up your OpenAI API key to generate vocabulary explanations. Please click the Settings button to add your key.
+					<Alert severity='warning' variant='outlined' className='bg-white'>
+						You need to set up your OpenAI API key to generate vocabulary
+						explanations. Please click the Settings button to add your key.
 					</Alert>
 				</div>
-			)}
-			
+			) : undefined}
+
 			<div className='flex flex-grow overflow-hidden'>
-				<div className='w-[300px] bg-white border-r overflow-y-auto'>
-					<div className='p-4 border-b bg-white sticky top-0 z-10'>
+				<div className='w-[300px] overflow-y-auto border-r bg-white'>
+					<div className='sticky top-0 z-10 border-b bg-white p-4'>
 						<VocabularyInput onSubmit={handleInputSubmit} />
 					</div>
 					<VocabularyList
@@ -169,7 +170,7 @@ export default function Vocabulary(): ReactElement {
 					/>
 				</div>
 				<div className='flex-grow overflow-y-auto bg-white'>
-					<div className='max-w-3xl mx-auto p-6'>
+					<div className='mx-auto max-w-3xl p-6'>
 						<VocabularyDetail
 							vocabulary={selectedVocabulary}
 							onDetailGenerated={handleDetailGenerated}

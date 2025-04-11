@@ -8,12 +8,10 @@ import './index.css'
 // Register service worker with auto-update and refresh prompt
 const updateSW = registerSW({
 	onNeedRefresh() {
-		if (confirm('New content available. Reload to update?')) {
-			updateSW()
-		}
+		void updateSW()
 	},
 	onOfflineReady() {
-		console.log('App is ready for offline use')
+		// App is ready for offline use
 	}
 })
 
