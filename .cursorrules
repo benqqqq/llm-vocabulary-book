@@ -1,0 +1,46 @@
+# LLM Vocabulary Book Project Rules
+
+## Code Structure
+
+- Components should be organized in a feature-based structure
+- Vocabulary components are in src/components/Vocabulary
+- Database access is through src/storage/database.ts
+- OpenAI integration is through src/services/OpenAiContext.tsx
+
+## Naming Conventions
+
+- React components use PascalCase (VocabularyList, VocabularyDetail)
+- Interfaces are prefixed with 'I' (IVocabulary, ICredential)
+- Event handlers use the handle prefix (handleVocabularyClick, handleDeleteClick)
+
+## Component Patterns
+
+- React functional components with TypeScript
+- useState and useEffect for state management
+- useCallback for event handlers to prevent unnecessary re-renders
+- useMemo for computed values derived from state
+
+## Database Schema
+
+- vocabulary table: id, word, timestamp, archived, detail
+- credentials table: id, name, value
+
+## OpenAI Integration
+
+- GPT model used: gpt-4o-mini (configurable)
+- System prompt is defined in VocabularyDetail.tsx
+- Temperature setting: 1 (configurable)
+- Streaming API responses for real-time updates
+
+## UI Patterns
+
+- Material UI components for UI elements
+- Tailwind CSS for custom styling
+- Simple rendering for markdown content
+
+## Project Goals
+
+- Focus only on vocabulary learning feature
+- Clean, simple UI for vocabulary management
+- Efficient local storage of vocabulary items
+- High-quality AI-generated vocabulary explanations
