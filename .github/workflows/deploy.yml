@@ -47,8 +47,8 @@ jobs:
         run: pnpm install
 
       - name: Build
-        # deploy to github pages xxxx.github.io/gpt-tools/
-        run: pnpm run build --base /gpt-tools/
+        # deploy to github pages xxxx.github.io/llm-vocabulary-book/
+        run: pnpm run build --base /llm-vocabulary-book/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

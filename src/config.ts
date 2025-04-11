@@ -16,8 +16,9 @@ export const config: Record<string, Config> = {
 
 export const getConfig = (): Config => {
 	// Use a simple check based on the hostname to determine environment
-	const isDevelopment = window.location.hostname === 'localhost' || 
-		window.location.hostname === '127.0.0.1';
-	const environment = isDevelopment ? 'development' : 'production';
+	const isDevelopment =
+		window.location.hostname === 'localhost' ||
+		window.location.hostname === '127.0.0.1'
+	const environment = isDevelopment ? 'development' : 'production'
 	return config[environment]
 }
