@@ -1,8 +1,9 @@
-import { CircularProgress } from '@mui/material'
+import { Alert, CircularProgress } from '@mui/material'
 import type { ReactElement } from 'react'
 import { useEffect, useMemo, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { useOpenAI } from '../../services/OpenAiContext'
+import { useSettingContext } from '../../services/SettingContext'
 import type { IVocabulary } from './types'
 
 interface IVocabularyDetailProps {
@@ -26,8 +27,10 @@ export default function VocabularyDetail({
 	onDetailGenerated
 }: IVocabularyDetailProps): ReactElement {
 	const openai = useOpenAI()
+	const { setting } = useSettingContext()
 	const [isLoading, setIsLoading] = useState(false)
 	const [detail, setDetail] = useState('')
+	const [error, setError] = useState<string | null>(null)
 	const finishEvent = useMemo(() => new CustomEvent('finishEvent'), [])
 
 	useEffect(() => {
@@ -37,12 +40,20 @@ export default function VocabularyDetail({
 
 		if (vocabulary.detail) {
 			setDetail(vocabulary.detail)
+			setError(null)
+			return
+		}
+
+		// Check for API key
+		if (!setting.openaiApiKey) {
+			setError('OpenAI API key is missing. Please set it in the settings.')
 			return
 		}
 
 		const submit = async (): Promise<void> => {
 			setIsLoading(true)
 			setDetail('')
+			setError(null)
 			try {
 				await openai.chatCompletion({
 					messages: [
@@ -67,17 +78,18 @@ export default function VocabularyDetail({
 				})
 			} catch (error) {
 				const errorMessage = (error as Error).message
-				setDetail(errorMessage)
+				setDetail('')
+				setError(errorMessage)
 				setIsLoading(false)
 			}
 		}
 
 		void submit()
-	}, [finishEvent, openai, vocabulary])
+	}, [finishEvent, openai, vocabulary, setting.openaiApiKey])
 
 	useEffect(() => {
 		const listener = (): void => {
-			if (vocabulary) {
+			if (vocabulary && detail && !error) {
 				onDetailGenerated(detail)
 			}
 		}
@@ -86,13 +98,20 @@ export default function VocabularyDetail({
 		return () => {
 			document.removeEventListener('finishEvent', listener)
 		}
-	}, [detail, finishEvent, onDetailGenerated, vocabulary])
+	}, [detail, finishEvent, onDetailGenerated, vocabulary, error])
 
 	return (
 		<div>
 			<h3>VocabularyDetail</h3>
 			{isLoading ? <CircularProgress /> : undefined}
 			{vocabulary ? <div>{vocabulary.word}</div> : undefined}
+			
+			{error && (
+				<Alert severity="error" className="my-2">
+					{error}
+				</Alert>
+			)}
+			
 			{detail ? (
 				<div className="markdown-content">
 					<ReactMarkdown>{detail}</ReactMarkdown>

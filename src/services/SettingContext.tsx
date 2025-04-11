@@ -84,6 +84,12 @@ export function SettingProvider({
 				})
 			}
 
+			// Update local state immediately after database update
+			setSetting(prevSetting => ({
+				...prevSetting,
+				[settingKey]: value
+			}))
+
 			return new Promise<void>(resolve => {
 				if (simulateDelayMs > 0) {
 					setTimeout(() => {

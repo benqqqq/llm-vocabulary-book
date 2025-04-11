@@ -1,14 +1,19 @@
+import { Alert, Paper } from '@mui/material'
 import type { ReactElement } from 'react'
 import { useCallback, useEffect, useState } from 'react'
-import VocabularyList from '../components/Vocabulary/VocabularyList'
 import VocabularyDetail from '../components/Vocabulary/VocabularyDetail'
 import VocabularyInput from '../components/Vocabulary/VocabularyInput'
+import VocabularyList from '../components/Vocabulary/VocabularyList'
 import type { IVocabulary } from '../components/Vocabulary/types'
+import Setting from '../components/common/Setting'
+import { useSettingContext } from '../services/SettingContext'
 import { database } from '../storage/database'
 
 export default function Vocabulary(): ReactElement {
 	const [vocabularyList, setVocabularyList] = useState<IVocabulary[]>([])
 	const [selectedVocabulary, setSelectedVocabulary] = useState<IVocabulary>()
+	const [showApiKeyAlert, setShowApiKeyAlert] = useState(false)
+	const { setting } = useSettingContext()
 
 	useEffect(() => {
 		const fetchVocabularyListFromDatabase = async (): Promise<void> => {
@@ -21,6 +26,12 @@ export default function Vocabulary(): ReactElement {
 
 	const handleInputSubmit = useCallback(
 		(text: string) => {
+			// Check if API key exists
+			if (!setting.openaiApiKey) {
+				setShowApiKeyAlert(true)
+				return
+			}
+			
 			const insertVocabularyListIntoDatabase = async (): Promise<void> => {
 				const existingVocabulary = vocabularyList.find(
 					vocabulary => vocabulary.word === text
@@ -68,8 +79,15 @@ export default function Vocabulary(): ReactElement {
 
 			void insertVocabularyListIntoDatabase()
 		},
-		[vocabularyList]
+		[vocabularyList, setting.openaiApiKey]
 	)
+
+	// Reset alert when API key is added
+	useEffect(() => {
+		if (setting.openaiApiKey) {
+			setShowApiKeyAlert(false)
+		}
+	}, [setting.openaiApiKey])
 
 	const handleVocabularyClick = useCallback((vocabulary: IVocabulary) => {
 		setSelectedVocabulary(vocabulary)
@@ -114,23 +132,41 @@ export default function Vocabulary(): ReactElement {
 	)
 
 	return (
-		<div className='flex h-screen'>
-			<div className='w-[200px] overflow-y-scroll p-4'>
-				<VocabularyList
-					vocabularyList={vocabularyList}
-					onVocabularyClick={handleVocabularyClick}
-					onVocabularyDeleteClick={handleVocabularyDeleteClick}
-				/>
+		<div className='flex h-screen flex-col'>
+			<div className='flex justify-between items-center p-4 border-b'>
+				<h2 className='text-xl'>LLM Vocabulary Book</h2>
+				<Setting />
 			</div>
-			<div className='flex max-w-[calc(100%-200px)] flex-grow flex-col'>
-				<div className='p-4'>
-					<VocabularyInput onSubmit={handleInputSubmit} />
-				</div>
-				<div className='flex-grow p-4'>
-					<VocabularyDetail
-						vocabulary={selectedVocabulary}
-						onDetailGenerated={handleDetailGenerated}
+			
+			{showApiKeyAlert && (
+				<Paper elevation={2} className='m-4'>
+					<Alert 
+						severity="warning" 
+						className='mb-4'
+					>
+						You need to set up your OpenAI API key to generate vocabulary explanations. Please click "Edit Setting" to add your key.
+					</Alert>
+				</Paper>
+			)}
+			
+			<div className='flex flex-grow'>
+				<div className='w-[200px] overflow-y-scroll p-4'>
+					<VocabularyList
+						vocabularyList={vocabularyList}
+						onVocabularyClick={handleVocabularyClick}
+						onVocabularyDeleteClick={handleVocabularyDeleteClick}
 					/>
+				</div>
+				<div className='flex max-w-[calc(100%-200px)] flex-grow flex-col'>
+					<div className='p-4'>
+						<VocabularyInput onSubmit={handleInputSubmit} />
+					</div>
+					<div className='flex-grow p-4'>
+						<VocabularyDetail
+							vocabulary={selectedVocabulary}
+							onDetailGenerated={handleDetailGenerated}
+						/>
+					</div>
 				</div>
 			</div>
 		</div>
