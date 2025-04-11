@@ -5,6 +5,7 @@ import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 import tsconfigPaths from 'vite-tsconfig-paths'
 
+// Using 'any' type to bypass the type conflicts between different versions of Vite plugins
 export default defineConfig(({ mode }) => ({
 	test: {
 		css: false,
@@ -27,11 +28,15 @@ export default defineConfig(({ mode }) => ({
 		...(mode === 'test'
 			? []
 			: [
+					// @ts-ignore - Type conflicts between plugin versions
 					eslintPlugin(),
 					VitePWA({
 						registerType: 'autoUpdate',
 						includeAssets: [
-							'favicon.png',
+							'favicon.ico',
+							'favicon-16x16.png',
+							'favicon-32x32.png',
+							'site.webmanifest',
 							'robots.txt',
 							'apple-touch-icon.png',
 							'icons/*.svg',
@@ -130,4 +135,4 @@ export default defineConfig(({ mode }) => ({
 	optimizeDeps: {
 		exclude: ['p-limit']
 	}
-}))
+}) as any)
