@@ -1,11 +1,21 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import App from 'App'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { registerSW } from 'virtual:pwa-register'
 import './index.css'
 
-registerSW()
+// Register service worker with auto-update and refresh prompt
+const updateSW = registerSW({
+	onNeedRefresh() {
+		if (confirm('New content available. Reload to update?')) {
+			updateSW()
+		}
+	},
+	onOfflineReady() {
+		console.log('App is ready for offline use')
+	}
+})
 
 const MAX_RETRIES = 1
 const queryClient = new QueryClient({

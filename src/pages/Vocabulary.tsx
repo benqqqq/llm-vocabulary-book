@@ -5,6 +5,7 @@ import VocabularyDetail from '../components/Vocabulary/VocabularyDetail'
 import VocabularyInput from '../components/Vocabulary/VocabularyInput'
 import VocabularyList from '../components/Vocabulary/VocabularyList'
 import type { IVocabulary } from '../components/Vocabulary/types'
+import InstallPWA from '../components/common/InstallPWA'
 import Setting from '../components/common/Setting'
 import { useSettingContext } from '../services/SettingContext'
 import { database } from '../storage/database'
@@ -138,7 +139,10 @@ export default function Vocabulary(): ReactElement {
 					<h1 className='text-2xl font-bold text-gray-800'>LLM Vocabulary Book</h1>
 					<span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-full">{vocabularyList.length} words</span>
 				</div>
-				<Setting />
+				<div className="flex items-center gap-2">
+					<InstallPWA />
+					<Setting />
+				</div>
 			</div>
 			
 			{showApiKeyAlert && (
