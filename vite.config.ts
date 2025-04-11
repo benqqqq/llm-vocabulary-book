@@ -48,8 +48,8 @@ export default defineConfig(
 									name: 'LLM Vocabulary Book',
 									short_name: 'Vocab Book',
 									description: 'A vocabulary learning app powered by AI',
-									theme_color: '#BD34FE',
-									background_color: '#ffffff',
+									theme_color: '#8B4513',
+									background_color: '#D2B48C',
 									display: 'standalone',
 									start_url: '/llm-vocabulary-book/',
 									icons: [
