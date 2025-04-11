@@ -13,7 +13,7 @@ interface BeforeInstallPromptEvent extends Event {
 	prompt: () => Promise<void>
 }
 
-export default function InstallPwa(): ReactElement {
+export default function InstallPwa(): ReactElement | null {
 	const [supportsPWA, setSupportsPWA] = useState(false)
 	const [promptInstall, setPromptInstall] = useState<BeforeInstallPromptEvent>()
 
@@ -53,7 +53,7 @@ export default function InstallPwa(): ReactElement {
 	}, [promptInstall])
 
 	if (!supportsPWA) {
-		return undefined
+		return null
 	}
 
 	return (
