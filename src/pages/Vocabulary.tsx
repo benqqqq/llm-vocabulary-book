@@ -1,4 +1,4 @@
-import { Alert, Paper } from '@mui/material'
+import { Alert } from '@mui/material'
 import type { ReactElement } from 'react'
 import { useCallback, useEffect, useState } from 'react'
 import VocabularyDetail from '../components/Vocabulary/VocabularyDetail'
@@ -132,36 +132,40 @@ export default function Vocabulary(): ReactElement {
 	)
 
 	return (
-		<div className='flex h-screen flex-col'>
-			<div className='flex justify-between items-center p-4 border-b'>
-				<h2 className='text-xl'>LLM Vocabulary Book</h2>
+		<div className='flex h-screen flex-col bg-gray-50'>
+			<div className='flex justify-between items-center p-4 bg-white border-b shadow-sm'>
+				<div className="flex items-center gap-2">
+					<h1 className='text-2xl font-bold text-gray-800'>LLM Vocabulary Book</h1>
+					<span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-full">{vocabularyList.length} words</span>
+				</div>
 				<Setting />
 			</div>
 			
 			{showApiKeyAlert && (
-				<Paper elevation={2} className='m-4'>
+				<div className='mx-4 mt-4'>
 					<Alert 
-						severity="warning" 
-						className='mb-4'
+						severity="warning"
+						variant="outlined"
+						className='bg-white'
 					>
-						You need to set up your OpenAI API key to generate vocabulary explanations. Please click "Edit Setting" to add your key.
+						You need to set up your OpenAI API key to generate vocabulary explanations. Please click the Settings button to add your key.
 					</Alert>
-				</Paper>
+				</div>
 			)}
 			
-			<div className='flex flex-grow'>
-				<div className='w-[200px] overflow-y-scroll p-4'>
+			<div className='flex flex-grow overflow-hidden'>
+				<div className='w-[300px] bg-white border-r overflow-y-auto'>
+					<div className='p-4 border-b bg-white sticky top-0 z-10'>
+						<VocabularyInput onSubmit={handleInputSubmit} />
+					</div>
 					<VocabularyList
 						vocabularyList={vocabularyList}
 						onVocabularyClick={handleVocabularyClick}
 						onVocabularyDeleteClick={handleVocabularyDeleteClick}
 					/>
 				</div>
-				<div className='flex max-w-[calc(100%-200px)] flex-grow flex-col'>
-					<div className='p-4'>
-						<VocabularyInput onSubmit={handleInputSubmit} />
-					</div>
-					<div className='flex-grow p-4'>
+				<div className='flex-grow overflow-y-auto bg-white'>
+					<div className='max-w-3xl mx-auto p-6'>
 						<VocabularyDetail
 							vocabulary={selectedVocabulary}
 							onDetailGenerated={handleDetailGenerated}

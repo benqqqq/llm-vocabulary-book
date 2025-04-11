@@ -1,39 +1,62 @@
+import AddIcon from '@mui/icons-material/Add'
+import { IconButton, InputAdornment, TextField } from '@mui/material'
 import type { ReactElement } from 'react'
-import { TextField } from '@mui/material'
 import { useCallback, useState } from 'react'
 
 interface IVocabularyInputProps {
 	onSubmit: (text: string) => void
 }
+
 export default function VocabularyInput({
 	onSubmit
 }: IVocabularyInputProps): ReactElement {
 	const [text, setText] = useState('')
+	
 	const handleTextChange = useCallback(
 		(event: React.ChangeEvent<HTMLInputElement>) => {
 			setText(event.target.value)
 		},
 		[]
 	)
+
+	const handleSubmit = useCallback(() => {
+		if (text.trim()) {
+			onSubmit(text.toLowerCase().trim())
+			setText('')
+		}
+	}, [onSubmit, text])
+	
 	const handleKeyDown = useCallback(
 		(event: React.KeyboardEvent) => {
 			if (event.key === 'Enter') {
-				onSubmit(text.toLowerCase())
-				setText('')
+				handleSubmit()
 			}
 		},
-		[onSubmit, text]
+		[handleSubmit]
 	)
+
 	return (
-		<div>
-			<h3>VocabularyInput</h3>
-			<TextField
-				autoFocus
-				placeholder='New word'
-				value={text}
-				onChange={handleTextChange}
-				onKeyDown={handleKeyDown}
-			/>
-		</div>
+		<TextField
+			fullWidth
+			size="small"
+			placeholder="Add new word..."
+			value={text}
+			onChange={handleTextChange}
+			onKeyDown={handleKeyDown}
+			InputProps={{
+				endAdornment: (
+					<InputAdornment position="end">
+						<IconButton 
+							edge="end"
+							onClick={handleSubmit}
+							disabled={!text.trim()}
+							size="small"
+						>
+							<AddIcon />
+						</IconButton>
+					</InputAdornment>
+				)
+			}}
+		/>
 	)
 }

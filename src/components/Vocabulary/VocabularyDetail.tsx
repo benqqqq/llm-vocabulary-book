@@ -1,4 +1,4 @@
-import { Alert, CircularProgress } from '@mui/material'
+import { Alert, CircularProgress, Paper } from '@mui/material'
 import type { ReactElement } from 'react'
 import { useEffect, useMemo, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
@@ -100,23 +100,45 @@ export default function VocabularyDetail({
 		}
 	}, [detail, finishEvent, onDetailGenerated, vocabulary, error])
 
+	if (!vocabulary) {
+		return (
+			<div className="flex items-center justify-center h-full text-gray-500">
+				Select a word from the list to view its details
+			</div>
+		)
+	}
+
 	return (
-		<div>
-			<h3>VocabularyDetail</h3>
-			{isLoading ? <CircularProgress /> : undefined}
-			{vocabulary ? <div>{vocabulary.word}</div> : undefined}
-			
+		<div className="space-y-4">
+			<Paper elevation={0} className="p-6 bg-gray-50">
+				<h2 className="text-3xl font-bold text-gray-900 mb-2">
+					{vocabulary.word}
+				</h2>
+				{isLoading && (
+					<div className="flex items-center gap-2 text-gray-600">
+						<CircularProgress size={16} />
+						<span>Generating detailed explanation...</span>
+					</div>
+				)}
+			</Paper>
+
 			{error && (
-				<Alert severity="error" className="my-2">
+				<Alert 
+					severity="error" 
+					variant="outlined"
+					className="bg-white"
+				>
 					{error}
 				</Alert>
 			)}
 			
-			{detail ? (
-				<div className="markdown-content">
-					<ReactMarkdown>{detail}</ReactMarkdown>
-				</div>
-			) : undefined}
+			{detail && (
+				<Paper elevation={0} className="p-6">
+					<div className="prose prose-gray max-w-none">
+						<ReactMarkdown>{detail}</ReactMarkdown>
+					</div>
+				</Paper>
+			)}
 		</div>
 	)
 }
