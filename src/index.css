@@ -24,4 +24,22 @@
 		font-display: swap;
 		src: url('/fonts/Inter-Bold.woff2') format('woff2');
 	}
+
+	/* Improved touch targets for mobile */
+	button,
+	a {
+		@apply touch-manipulation;
+	}
+
+	/* Prevent text from being too small on mobile */
+	html {
+		text-size-adjust: 100%;
+	}
+
+	/* Adjust default font size for better mobile reading */
+	@media (width <= 640px) {
+		html {
+			font-size: 15px;
+		}
+	}
 }

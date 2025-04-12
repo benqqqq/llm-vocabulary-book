@@ -11,7 +11,7 @@ export default function VocabularyInput({
 	onSubmit
 }: IVocabularyInputProps): ReactElement {
 	const [text, setText] = useState('')
-	
+
 	const handleTextChange = useCallback(
 		(event: React.ChangeEvent<HTMLInputElement>) => {
 			setText(event.target.value)
@@ -25,7 +25,7 @@ export default function VocabularyInput({
 			setText('')
 		}
 	}, [onSubmit, text])
-	
+
 	const handleKeyDown = useCallback(
 		(event: React.KeyboardEvent) => {
 			if (event.key === 'Enter') {
@@ -38,24 +38,30 @@ export default function VocabularyInput({
 	return (
 		<TextField
 			fullWidth
-			size="small"
-			placeholder="Add new word..."
+			size='small'
+			placeholder='Add new word...'
 			value={text}
 			onChange={handleTextChange}
 			onKeyDown={handleKeyDown}
 			InputProps={{
 				endAdornment: (
-					<InputAdornment position="end">
-						<IconButton 
-							edge="end"
+					<InputAdornment position='end'>
+						<IconButton
+							edge='end'
 							onClick={handleSubmit}
 							disabled={!text.trim()}
-							size="small"
+							size='small'
+							className='p-1 md:p-2'
 						>
 							<AddIcon />
 						</IconButton>
 					</InputAdornment>
 				)
+			}}
+			sx={{
+				'& .MuiInputBase-root': {
+					borderRadius: '8px'
+				}
 			}}
 		/>
 	)

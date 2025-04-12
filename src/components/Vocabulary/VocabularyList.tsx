@@ -109,7 +109,7 @@ export default function VocabularyList({
 					<Tooltip title='Delete word'>
 						<IconButton
 							onClick={handleDeleteClick(item)}
-							className='opacity-0 group-hover:opacity-100'
+							className='opacity-100 md:opacity-0 md:group-hover:opacity-100'
 							size='small'
 							color='error'
 						>

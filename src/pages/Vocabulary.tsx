@@ -14,6 +14,7 @@ export default function Vocabulary(): ReactElement {
 	const [vocabularyList, setVocabularyList] = useState<IVocabulary[]>([])
 	const [selectedVocabulary, setSelectedVocabulary] = useState<IVocabulary>()
 	const [showApiKeyAlert, setShowApiKeyAlert] = useState(false)
+	const [showMobileDetail, setShowMobileDetail] = useState(false)
 	const { setting } = useSettingContext()
 
 	useEffect(() => {
@@ -92,6 +93,14 @@ export default function Vocabulary(): ReactElement {
 
 	const handleVocabularyClick = useCallback((vocabulary: IVocabulary) => {
 		setSelectedVocabulary(vocabulary)
+
+		// On mobile, set the detail view as visible and scroll to it
+		if (window.innerWidth < 768) {
+			setShowMobileDetail(true)
+			setTimeout(() => {
+				window.scrollTo({ top: 0, behavior: 'smooth' })
+			}, 100)
+		}
 	}, [])
 
 	const handleVocabularyDeleteClick = useCallback((vocabulary: IVocabulary) => {
@@ -132,14 +141,20 @@ export default function Vocabulary(): ReactElement {
 		[selectedVocabulary]
 	)
 
+	// Add a function to handle mobile navigation back to the list
+	const handleBackToList = useCallback(() => {
+		// On mobile, hide the detail view
+		setShowMobileDetail(false)
+	}, [])
+
 	return (
 		<div className='flex h-screen flex-col bg-gray-50'>
 			<div className='flex items-center justify-between border-b bg-white p-4 shadow-sm'>
 				<div className='flex items-center gap-2'>
-					<h1 className='text-2xl font-bold text-gray-800'>
+					<h1 className='text-xl font-bold text-gray-800 md:text-2xl'>
 						LLM Vocabulary Book
 					</h1>
-					<span className='rounded-full bg-gray-100 px-2 py-1 text-sm text-gray-500'>
+					<span className='rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-500 md:text-sm'>
 						{vocabularyList.length} words
 					</span>
 				</div>
@@ -158,8 +173,12 @@ export default function Vocabulary(): ReactElement {
 				</div>
 			) : undefined}
 
-			<div className='flex flex-grow overflow-hidden'>
-				<div className='w-[300px] overflow-y-auto border-r bg-white'>
+			<div className='flex flex-grow flex-col overflow-hidden md:flex-row'>
+				<div
+					className={`h-auto w-full overflow-y-auto border-b bg-white md:h-auto md:w-[300px] md:border-b-0 md:border-r ${
+						showMobileDetail ? 'hidden md:block' : 'max-h-[50vh]'
+					}`}
+				>
 					<div className='sticky top-0 z-10 border-b bg-white p-4'>
 						<VocabularyInput onSubmit={handleInputSubmit} />
 					</div>
@@ -169,11 +188,16 @@ export default function Vocabulary(): ReactElement {
 						onVocabularyDeleteClick={handleVocabularyDeleteClick}
 					/>
 				</div>
-				<div className='flex-grow overflow-y-auto bg-white'>
-					<div className='mx-auto max-w-3xl p-6'>
+				<div
+					className={`flex-grow overflow-y-auto bg-white ${
+						showMobileDetail ? 'block' : 'hidden md:block'
+					}`}
+				>
+					<div className='mx-auto max-w-3xl p-4 md:p-6'>
 						<VocabularyDetail
 							vocabulary={selectedVocabulary}
 							onDetailGenerated={handleDetailGenerated}
+							onBackToList={handleBackToList}
 						/>
 					</div>
 				</div>

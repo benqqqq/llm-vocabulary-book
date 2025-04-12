@@ -1,3 +1,4 @@
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import VolumeUpIcon from '@mui/icons-material/VolumeUp'
 import {
 	Alert,
@@ -16,6 +17,7 @@ import type { IVocabulary } from './types'
 interface IVocabularyDetailProps {
 	vocabulary: IVocabulary | undefined
 	onDetailGenerated: (detail: string) => void
+	onBackToList?: () => void
 }
 
 const GPT_TEMPERATURE = 1
@@ -29,10 +31,8 @@ Example sentences demonstrating how the word is used in various contexts.
 A list of vocabulary words that are similar in meaning or usage, along with a brief explanation of when it is appropriate to use each word.
 In addition, feel free to include any other information you believe will be useful for someone trying to learn and understand this vocabulary word. Be sure to organize this information in a clear and appealing way, using markdown formatting to enhance its readability.`
 
-export default function VocabularyDetail({
-	vocabulary,
-	onDetailGenerated
-}: IVocabularyDetailProps): ReactElement {
+function VocabularyDetail(props: IVocabularyDetailProps): ReactElement {
+	const { vocabulary, onDetailGenerated, onBackToList } = props
 	const openai = useOpenAI()
 	const { setting } = useSettingContext()
 	const [isLoading, setIsLoading] = useState(false)
@@ -65,6 +65,12 @@ export default function VocabularyDetail({
 
 		window.speechSynthesis.speak(utterance)
 	}, [vocabulary, isPlaying])
+
+	const handleBackClick = useCallback(() => {
+		if (onBackToList) {
+			onBackToList()
+		}
+	}, [onBackToList])
 
 	useEffect(() => {
 		if (!vocabulary) {
@@ -143,9 +149,20 @@ export default function VocabularyDetail({
 
 	return (
 		<div className='space-y-4'>
-			<Paper elevation={0} className='bg-gray-50 p-6'>
+			<div className='mb-2 flex items-center md:hidden'>
+				<IconButton
+					onClick={handleBackClick}
+					size='small'
+					className='text-gray-600'
+					aria-label='Back to list'
+				>
+					<ArrowBackIcon />
+				</IconButton>
+				<span className='ml-1 text-sm text-gray-600'>Back to list</span>
+			</div>
+			<Paper elevation={0} className='bg-gray-50 p-4 md:p-6'>
 				<div className='mb-2 flex items-center gap-2'>
-					<h2 className='m-0 text-3xl font-bold text-gray-900'>
+					<h2 className='m-0 text-2xl font-bold text-gray-900 md:text-3xl'>
 						{vocabulary.word}
 					</h2>
 					<Tooltip title='Listen to pronunciation'>
@@ -174,8 +191,8 @@ export default function VocabularyDetail({
 			) : undefined}
 
 			{detail ? (
-				<Paper elevation={0} className='p-6'>
-					<div className='prose prose-gray max-w-none'>
+				<Paper elevation={0} className='p-4 md:p-6'>
+					<div className='prose prose-sm prose-gray max-w-none overflow-x-auto md:prose-base'>
 						<ReactMarkdown>{detail}</ReactMarkdown>
 					</div>
 				</Paper>
@@ -183,3 +200,9 @@ export default function VocabularyDetail({
 		</div>
 	)
 }
+
+VocabularyDetail.defaultProps = {
+	onBackToList: undefined
+}
+
+export default VocabularyDetail
