@@ -4,4 +4,5 @@ export interface IVocabulary {
 	timestamp: Date
 	archived: boolean
 	detail?: string
+	reviewCount?: number
 }

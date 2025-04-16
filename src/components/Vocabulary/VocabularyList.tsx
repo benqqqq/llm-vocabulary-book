@@ -1,12 +1,7 @@
 import AccessTimeIcon from '@mui/icons-material/AccessTime'
 import DeleteIcon from '@mui/icons-material/Delete'
-import {
-	IconButton,
-	List,
-	ListItemButton,
-	ListItemText,
-	Tooltip
-} from '@mui/material'
+import SchoolIcon from '@mui/icons-material/School'
+import { Chip, IconButton, List, ListItemButton, Tooltip } from '@mui/material'
 import type { ReactElement } from 'react'
 import { useCallback, useMemo } from 'react'
 import type { IVocabulary } from './types'
@@ -91,31 +86,40 @@ export default function VocabularyList({
 					className='group hover:bg-gray-50'
 				>
 					<div className='flex flex-grow flex-col py-1'>
-						<ListItemText
-							primary={
-								<span className='font-medium text-gray-900'>{item.word}</span>
-							}
-							secondary={
-								<div className='mt-1 flex items-center gap-1 text-xs text-gray-500'>
-									<AccessTimeIcon
-										sx={{ fontSize: DAYS_PER_WEEK * ICON_SIZE_MULTIPLIER }}
-									/>
-									{formatDate(item.timestamp)}
-								</div>
-							}
-							className='my-0'
-						/>
+						<div className='flex items-center justify-between'>
+							<span className='font-medium text-gray-900'>{item.word}</span>
+							<div className='flex items-center'>
+								{item.reviewCount ? (
+									<Tooltip title='Review count'>
+										<Chip
+											icon={<SchoolIcon fontSize='small' />}
+											label={item.reviewCount}
+											size='small'
+											className='ml-2'
+											color='primary'
+											variant='outlined'
+										/>
+									</Tooltip>
+								) : null}
+								<Tooltip title='Delete word'>
+									<IconButton
+										onClick={handleDeleteClick(item)}
+										className='opacity-100 md:opacity-0 md:group-hover:opacity-100'
+										size='small'
+										color='error'
+									>
+										<DeleteIcon fontSize='small' />
+									</IconButton>
+								</Tooltip>
+							</div>
+						</div>
+						<div className='mt-1 flex items-center gap-1 text-xs text-gray-500'>
+							<AccessTimeIcon
+								sx={{ fontSize: DAYS_PER_WEEK * ICON_SIZE_MULTIPLIER }}
+							/>
+							{formatDate(item.timestamp)}
+						</div>
 					</div>
-					<Tooltip title='Delete word'>
-						<IconButton
-							onClick={handleDeleteClick(item)}
-							className='opacity-100 md:opacity-0 md:group-hover:opacity-100'
-							size='small'
-							color='error'
-						>
-							<DeleteIcon fontSize='small' />
-						</IconButton>
-					</Tooltip>
 				</ListItemButton>
 			))}
 		</List>

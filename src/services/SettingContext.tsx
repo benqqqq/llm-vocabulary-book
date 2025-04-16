@@ -11,6 +11,7 @@ import { database } from '../storage/database'
 
 interface ISetting {
 	openaiApiKey: string
+	openaiModel: string
 }
 
 export interface ISettingContext {
@@ -27,7 +28,8 @@ export interface ISettingContext {
 
 export const defaultSettingContext: ISettingContext = {
 	setting: {
-		openaiApiKey: ''
+		openaiApiKey: '',
+		openaiModel: 'gpt-4.1-nano'
 	},
 	isLoading: false,
 	storeSetting: async () => {}

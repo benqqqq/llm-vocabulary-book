@@ -1,9 +1,10 @@
-import { Alert } from '@mui/material'
+import { Alert, Tab, Tabs } from '@mui/material'
 import type { ReactElement } from 'react'
 import { useCallback, useEffect, useState } from 'react'
 import VocabularyDetail from '../components/Vocabulary/VocabularyDetail'
 import VocabularyInput from '../components/Vocabulary/VocabularyInput'
 import VocabularyList from '../components/Vocabulary/VocabularyList'
+import VocabularyReview from '../components/Vocabulary/VocabularyReview'
 import type { IVocabulary } from '../components/Vocabulary/types'
 import InstallPwa from '../components/common/InstallPwa'
 import Setting from '../components/common/Setting'
@@ -15,6 +16,9 @@ export default function Vocabulary(): ReactElement {
 	const [selectedVocabulary, setSelectedVocabulary] = useState<IVocabulary>()
 	const [showApiKeyAlert, setShowApiKeyAlert] = useState(false)
 	const [showMobileDetail, setShowMobileDetail] = useState(false)
+	const [activeTab, setActiveTab] = useState<'review' | 'vocabulary'>(
+		'vocabulary'
+	)
 	const { setting } = useSettingContext()
 
 	useEffect(() => {
@@ -58,11 +62,13 @@ export default function Vocabulary(): ReactElement {
 						})
 					)
 					setSelectedVocabulary(newVocabulary)
+					setActiveTab('vocabulary')
 				} else {
 					const newVocabularyData = {
 						word: text,
 						archived: false,
-						timestamp: new Date()
+						timestamp: new Date(),
+						reviewCount: 0
 					}
 
 					const id = await database.vocabulary.add(newVocabularyData)
@@ -76,6 +82,7 @@ export default function Vocabulary(): ReactElement {
 						newVocabulary
 					])
 					setSelectedVocabulary(newVocabulary)
+					setActiveTab('vocabulary')
 				}
 			}
 
@@ -93,6 +100,7 @@ export default function Vocabulary(): ReactElement {
 
 	const handleVocabularyClick = useCallback((vocabulary: IVocabulary) => {
 		setSelectedVocabulary(vocabulary)
+		setActiveTab('vocabulary')
 
 		// On mobile, set the detail view as visible and scroll to it
 		if (window.innerWidth < 768) {
@@ -147,6 +155,63 @@ export default function Vocabulary(): ReactElement {
 		setShowMobileDetail(false)
 	}, [])
 
+	// Add a function to handle tab changes
+	const handleTabChange = useCallback(
+		(_event: React.SyntheticEvent, newValue: 'review' | 'vocabulary') => {
+			setActiveTab(newValue)
+		},
+		[]
+	)
+
+	// Handle vocabulary selection from review
+	const handleVocabularySelectFromReview = useCallback(
+		(id: number): void => {
+			const vocabulary = vocabularyList.find(item => item.id === id)
+			if (vocabulary) {
+				setSelectedVocabulary(vocabulary)
+				setActiveTab('vocabulary')
+			}
+		},
+		[vocabularyList]
+	)
+
+	// Update a vocabulary's review count when it's used in a review
+	const handleVocabularyReviewed = useCallback(
+		(reviewedIds: number[]): void => {
+			// Update reviewCount in the database and state
+			const updateReviewCount = async (): Promise<void> => {
+				// Process all updates in parallel instead of sequentially
+				await Promise.all(
+					reviewedIds.map(async id => {
+						const vocabulary = vocabularyList.find(v => v.id === id)
+						if (vocabulary) {
+							const currentCount = vocabulary.reviewCount ?? 0
+							await database.vocabulary.update(id, {
+								reviewCount: currentCount + 1
+							})
+						}
+					})
+				)
+
+				// Update the state
+				setVocabularyList(previousList =>
+					previousList.map(item => {
+						if (reviewedIds.includes(item.id)) {
+							return {
+								...item,
+								reviewCount: (item.reviewCount ?? 0) + 1
+							}
+						}
+						return item
+					})
+				)
+			}
+
+			void updateReviewCount()
+		},
+		[vocabularyList]
+	)
+
 	return (
 		<div className='flex h-screen flex-col bg-gray-50'>
 			<div className='flex items-center justify-between border-b bg-white p-4 shadow-sm'>
@@ -173,35 +238,67 @@ export default function Vocabulary(): ReactElement {
 				</div>
 			) : undefined}
 
-			<div className='flex flex-grow flex-col overflow-hidden md:flex-row'>
-				<div
-					className={`h-auto w-full overflow-y-auto border-b bg-white md:h-auto md:w-[300px] md:border-b-0 md:border-r ${
-						showMobileDetail ? 'hidden md:block' : 'max-h-[50vh]'
-					}`}
+			<div className='border-b bg-white'>
+				<Tabs
+					value={activeTab}
+					onChange={handleTabChange}
+					className='px-4'
+					indicatorColor='primary'
+					textColor='primary'
+					centered
 				>
-					<div className='sticky top-0 z-10 border-b bg-white p-4'>
-						<VocabularyInput onSubmit={handleInputSubmit} />
+					<Tab label='Vocabulary' value='vocabulary' />
+					<Tab label='Review' value='review' />
+				</Tabs>
+			</div>
+
+			{activeTab === 'vocabulary' ? (
+				<div className='flex flex-grow flex-col overflow-hidden md:flex-row'>
+					<div
+						className={`h-auto w-full overflow-y-auto border-b bg-white md:h-auto md:w-[300px] md:border-b-0 md:border-r ${
+							showMobileDetail ? 'hidden md:block' : 'max-h-[50vh]'
+						}`}
+					>
+						<div className='sticky top-0 z-10 border-b bg-white p-4'>
+							<VocabularyInput onSubmit={handleInputSubmit} />
+						</div>
+						<VocabularyList
+							vocabularyList={vocabularyList}
+							onVocabularyClick={handleVocabularyClick}
+							onVocabularyDeleteClick={handleVocabularyDeleteClick}
+						/>
 					</div>
-					<VocabularyList
-						vocabularyList={vocabularyList}
-						onVocabularyClick={handleVocabularyClick}
-						onVocabularyDeleteClick={handleVocabularyDeleteClick}
-					/>
+					<div
+						className={`flex-grow overflow-y-auto bg-white ${
+							showMobileDetail ? 'block' : 'hidden md:block'
+						}`}
+					>
+						<div className='mx-auto max-w-3xl p-4 md:p-6'>
+							{selectedVocabulary ? (
+								<VocabularyDetail
+									vocabulary={selectedVocabulary}
+									onDetailGenerated={handleDetailGenerated}
+									onBackToList={handleBackToList}
+								/>
+							) : (
+								<div className='flex h-full items-center justify-center text-gray-500'>
+									Select a word from the list to view its details
+								</div>
+							)}
+						</div>
+					</div>
 				</div>
-				<div
-					className={`flex-grow overflow-y-auto bg-white ${
-						showMobileDetail ? 'block' : 'hidden md:block'
-					}`}
-				>
-					<div className='mx-auto max-w-3xl p-4 md:p-6'>
-						<VocabularyDetail
-							vocabulary={selectedVocabulary}
-							onDetailGenerated={handleDetailGenerated}
-							onBackToList={handleBackToList}
+			) : (
+				<div className='flex-grow overflow-y-auto bg-white p-4 md:p-6'>
+					<div className='mx-auto max-w-3xl'>
+						<VocabularyReview
+							vocabularyList={vocabularyList}
+							onVocabularySelect={handleVocabularySelectFromReview}
+							onVocabularyReviewed={handleVocabularyReviewed}
 						/>
 					</div>
 				</div>
-			</div>
+			)}
 		</div>
 	)
 }

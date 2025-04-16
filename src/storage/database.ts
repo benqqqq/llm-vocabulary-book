@@ -13,13 +13,14 @@ interface IVocabulary {
 	timestamp: Date
 	archived: boolean
 	detail?: string
+	reviewCount?: number
 }
 
-const VERSION = 8
+const VERSION = 9
 
 export class MySubClassedDexie extends Dexie {
 	public readonly credentials!: Table<ICredential>
-	
+
 	public readonly vocabulary!: Table<IVocabulary>
 
 	public constructor() {
@@ -27,7 +28,7 @@ export class MySubClassedDexie extends Dexie {
 		this.version(VERSION).stores({
 			// Primary key and indexed props
 			credentials: '++id, name',
-			vocabulary: '++id, word, timestamp, archived'
+			vocabulary: '++id, word, timestamp, archived, reviewCount'
 		})
 	}
 }
