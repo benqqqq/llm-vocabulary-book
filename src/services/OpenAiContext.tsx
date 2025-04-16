@@ -15,7 +15,8 @@ export const GPT_MODELS = [
 	'gpt-4',
 	'gpt-4-32k',
 	'gpt-4o',
-	'gpt-4o-mini'
+	'gpt-4o-mini',
+	'gpt-4.1-nano'
 ] as const
 
 export interface IChatCompletionOptions {
@@ -89,13 +90,13 @@ const chatCompletion = async (
 	}
 	try {
 		// eslint-disable-next-line no-await-in-loop
-		let { done, value } = await reader.read();
+		let { done, value } = await reader.read()
 		while (!done) {
-			parser.feed(new TextDecoder().decode(value));
+			parser.feed(new TextDecoder().decode(value))
 			// eslint-disable-next-line no-await-in-loop
-			({ done, value } = await reader.read());
+			;({ done, value } = await reader.read())
 		}
-		onFinish();
+		onFinish()
 	} finally {
 		reader.releaseLock()
 	}

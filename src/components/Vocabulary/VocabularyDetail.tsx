@@ -10,6 +10,8 @@ import {
 import type { ReactElement } from 'react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+
 import { useOpenAI } from '../../services/OpenAiContext'
 import { useSettingContext } from '../../services/SettingContext'
 import type { IVocabulary } from './types'
@@ -29,7 +31,9 @@ The etymology or history of the word, including its roots and how its usage has 
 The translation of the word into Mandarin Chinese (Taiwan).
 Example sentences demonstrating how the word is used in various contexts.
 A list of vocabulary words that are similar in meaning or usage, along with a brief explanation of when it is appropriate to use each word.
-In addition, feel free to include any other information you believe will be useful for someone trying to learn and understand this vocabulary word. Be sure to organize this information in a clear and appealing way, using markdown formatting to enhance its readability.`
+In addition, feel free to include any other information you believe will be useful for someone trying to learn and understand this vocabulary word. Be sure to organize this information in a clear and appealing way, using markdown formatting to enhance its readability.
+Do not include any conversational text and don't need to include the vocabulary title in the beginning.
+`
 
 function VocabularyDetail(props: IVocabularyDetailProps): ReactElement {
 	const { vocabulary, onDetailGenerated, onBackToList } = props
@@ -105,7 +109,7 @@ function VocabularyDetail(props: IVocabularyDetailProps): ReactElement {
 							content: `###${vocabulary.word}###`
 						}
 					],
-					model: 'gpt-4o-mini',
+					model: 'gpt-4.1-nano',
 					onContent: (content: string): void => {
 						setDetail(previousDetail => previousDetail + content)
 					},
@@ -193,7 +197,7 @@ function VocabularyDetail(props: IVocabularyDetailProps): ReactElement {
 			{detail ? (
 				<Paper elevation={0} className='p-4 md:p-6'>
 					<div className='prose prose-sm prose-gray max-w-none overflow-x-auto md:prose-base'>
-						<ReactMarkdown>{detail}</ReactMarkdown>
+						<ReactMarkdown remarkPlugins={[remarkGfm]}>{detail}</ReactMarkdown>
 					</div>
 				</Paper>
 			) : undefined}
