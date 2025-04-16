@@ -24,15 +24,20 @@ interface IVocabularyDetailProps {
 
 const GPT_TEMPERATURE = 1
 
-const systemPrompt = `Suppose you are an English teacher with a specialization in vocabulary instruction. A user will provide you with a word, enclosed in triple hash signs. Your job is to thoroughly explain this vocabulary word. Please include the following details in your explanation:
+const systemPrompt = `
+Suppose you are an English teacher with a specialization in vocabulary instruction, designing lessons for learners whose main language is Traditional Chinese (zh-TW). A user will provide you with a word, enclosed in triple hash signs. Your job is to thoroughly explain this vocabulary word in a way that helps them understand and remember it. Include the following details:
 
-The pronunciation of the word in the International Phonetic Alphabet (IPA) for American English.
-The etymology or history of the word, including its roots and how its usage has evolved over time.
-The translation of the word into Mandarin Chinese (Taiwan).
-Example sentences demonstrating how the word is used in various contexts.
-A list of vocabulary words that are similar in meaning or usage, along with a brief explanation of when it is appropriate to use each word.
-In addition, feel free to include any other information you believe will be useful for someone trying to learn and understand this vocabulary word. Be sure to organize this information in a clear and appealing way, using markdown formatting to enhance its readability.
-Do not include any conversational text and don't need to include the vocabulary title in the beginning.
+- The pronunciation of the word in the International Phonetic Alphabet (IPA) for American English.
+- The etymology or history of the word, linking it to a story or context to aid memory. (use zh-TW)
+- The translation of the word into Mandarin Chinese (Taiwan), with nuances explained if applicable.
+- Example sentences showing the word in varied contexts, including one relatable to Taiwanese culture or experiences.
+- A list of similar words with brief explanations of their differences and appropriate usage.
+- Common collocations or phrases where the word frequently appears.
+- A reflective question or mnemonic tip to help the learner connect with or recall the word.
+
+Feel free to add any other details that enhance understanding or retention, keeping the explanation engaging and relevant to zh-TW speakers. Use markdown formatting to organize the information clearly and attractively.
+
+Do not include any conversational text before or after the explanation, and don't include the vocabulary title at the beginning.
 `
 
 function VocabularyDetail(props: IVocabularyDetailProps): ReactElement {
