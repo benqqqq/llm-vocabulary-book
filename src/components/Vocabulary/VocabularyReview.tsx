@@ -1,11 +1,12 @@
 import { Box, Button, CircularProgress, Paper, Typography } from '@mui/material'
 import type React from 'react'
 import type { ReactElement } from 'react'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { GPT_MODELS, useOpenAI } from '../../services/OpenAiContext'
 import { useSettingContext } from '../../services/SettingContext'
+import { database } from '../../storage/database'
 import { THEME_COLORS } from '../../theme'
 import type { IVocabulary } from './types'
 
@@ -153,6 +154,28 @@ export default function VocabularyReview({
 	const openai = useOpenAI()
 	const { setting } = useSettingContext()
 
+	// Load the most recent review when component mounts
+	useEffect(() => {
+		const fetchLatestReview = async (): Promise<void> => {
+			try {
+				// Get the most recent review from the database
+				const reviews = await database.reviews
+					.orderBy('timestamp')
+					.reverse()
+					.limit(1)
+					.toArray()
+
+				if (reviews.length > 0) {
+					setReviewContent(reviews[0].content)
+				}
+			} catch (fetchError) {
+				console.error('Error fetching latest review:', fetchError)
+			}
+		}
+
+		void fetchLatestReview()
+	}, [])
+
 	const handleGenerateReview = useCallback(async () => {
 		if (vocabularyList.length === 0) {
 			setError('Please add some vocabulary words first to generate a review.')
@@ -190,6 +213,8 @@ export default function VocabularyReview({
 
 			const wordsList = sortedVocabulary.map(v => v.word).join(', ')
 
+			let fullContent = ''
+
 			await openai.chatCompletion({
 				messages: [
 					{
@@ -207,10 +232,27 @@ export default function VocabularyReview({
 					? (setting.openaiModel as (typeof GPT_MODELS)[number])
 					: 'gpt-4.1-nano',
 				onContent: (content: string): void => {
+					fullContent += content
 					setReviewContent(previousContent => previousContent + content)
 				},
 				onFinish: (): void => {
 					setIsLoading(false)
+
+					// Save the review to the database
+					const saveReview = async (): Promise<void> => {
+						try {
+							await database.reviews.add({
+								content: fullContent,
+								timestamp: new Date(),
+								vocabularyIds: wordIds
+							})
+						} catch (saveError) {
+							console.error('Error saving review:', saveError)
+						}
+					}
+
+					void saveReview()
+
 					// Update review counts when the review is generated
 					onVocabularyReviewed(wordIds)
 				},
