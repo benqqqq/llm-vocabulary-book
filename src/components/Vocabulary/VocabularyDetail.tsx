@@ -184,45 +184,42 @@ function VocabularyDetail(props: IVocabularyDetailProps): ReactElement {
 				}}
 				className='rounded-lg p-4 md:p-6'
 			>
-				<div className='mb-2 flex items-center justify-between'>
-					<div className='flex items-center gap-2'>
-						<Typography
-							variant='h4'
-							component='h2'
-							color='primary'
-							sx={{ fontWeight: 'bold' }}
-						>
-							{vocabulary.word}
-						</Typography>
-						<Tooltip title='Listen to pronunciation'>
-							<IconButton
-								onClick={handlePronounce}
-								disabled={isPlaying}
-								size='small'
-								color='secondary'
-							>
-								<VolumeUpIcon />
-							</IconButton>
-						</Tooltip>
-					</div>
-					{detail && !isLoading ? (
-						<Button
-							startIcon={<RefreshIcon />}
-							variant='outlined'
-							color='secondary'
+				<div className='mb-2 flex items-center gap-2'>
+					<Typography
+						variant='h4'
+						component='h2'
+						color='primary'
+						sx={{ fontWeight: 'bold' }}
+					>
+						{vocabulary.word}
+					</Typography>
+					<Tooltip title='Listen to pronunciation'>
+						<IconButton
+							onClick={handlePronounce}
+							disabled={isPlaying}
 							size='small'
-							onClick={handleRegenerateClick}
+							color='secondary'
 						>
-							Regenerate
-						</Button>
-					) : null}
+							<VolumeUpIcon />
+						</IconButton>
+					</Tooltip>
 				</div>
 				{isLoading ? (
 					<div className='flex items-center gap-2 text-gray-600'>
 						<CircularProgress size={16} color='primary' />
 						<span>Generating detailed explanation...</span>
 					</div>
-				) : null}
+				) : (detail ? (
+					<Button
+						startIcon={<RefreshIcon />}
+						variant='outlined'
+						color='secondary'
+						size='small'
+						onClick={handleRegenerateClick}
+					>
+						Regenerate
+					</Button>
+				) : undefined)}
 			</Paper>
 
 			{error ? (

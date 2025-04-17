@@ -63,14 +63,9 @@ export default function Setting(): ReactElement {
 	return (
 		<>
 			<Tooltip title='Open Settings'>
-				<Button
-					onClick={handleOpenDialog}
-					startIcon={<SettingsIcon />}
-					variant='outlined'
-					size='small'
-				>
-					Settings
-				</Button>
+				<IconButton onClick={handleOpenDialog} size='small'>
+					<SettingsIcon />
+				</IconButton>
 			</Tooltip>
 
 			<Dialog open={isOpen} onClose={handleCloseDialog} maxWidth='sm' fullWidth>

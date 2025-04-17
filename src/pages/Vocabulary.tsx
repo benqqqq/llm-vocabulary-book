@@ -243,7 +243,7 @@ export default function Vocabulary(): ReactElement {
 			<div className='flex items-center justify-between border-b bg-white p-4 shadow-sm'>
 				<div className='flex items-center gap-2'>
 					<h1 className='text-xl font-bold text-gray-800 md:text-2xl'>
-						LLM Vocabulary Book
+						Vocabulary Book
 					</h1>
 					<span className='rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-500 md:text-sm'>
 						{vocabularyList.length} words
@@ -282,7 +282,7 @@ export default function Vocabulary(): ReactElement {
 				<div className='flex flex-grow flex-col overflow-hidden md:flex-row'>
 					<div
 						className={`h-auto w-full overflow-y-auto border-b bg-white md:h-auto md:w-[300px] md:border-b-0 md:border-r ${
-							showMobileDetail ? 'hidden md:block' : 'max-h-[50vh]'
+							showMobileDetail ? 'hidden md:block' : ''
 						}`}
 					>
 						<div className='sticky top-0 z-10 border-b bg-white p-4'>
