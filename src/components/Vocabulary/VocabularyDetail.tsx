@@ -1,7 +1,9 @@
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+import RefreshIcon from '@mui/icons-material/Refresh'
 import VolumeUpIcon from '@mui/icons-material/VolumeUp'
 import {
 	Alert,
+	Button,
 	ButtonBase,
 	CircularProgress,
 	IconButton,
@@ -83,6 +85,46 @@ function VocabularyDetail(props: IVocabularyDetailProps): ReactElement {
 		}
 	}, [onBackToList])
 
+	const generateDetail = useCallback(async (): Promise<void> => {
+		if (!vocabulary || !setting.openaiApiKey) return
+
+		setIsLoading(true)
+		setDetail('')
+		setError('')
+		try {
+			await openai.chatCompletion({
+				messages: [
+					{
+						role: 'system',
+						content: systemPrompt
+					},
+					{
+						role: 'user',
+						content: `###${vocabulary.word}###`
+					}
+				],
+				model: 'gpt-4.1-nano',
+				onContent: (content: string): void => {
+					setDetail(previousDetail => previousDetail + content)
+				},
+				onFinish: (): void => {
+					setIsLoading(false)
+					document.dispatchEvent(finishEvent)
+				},
+				temperature: GPT_TEMPERATURE
+			})
+		} catch (error_) {
+			const errorMessage = (error_ as Error).message
+			setDetail('')
+			setError(errorMessage)
+			setIsLoading(false)
+		}
+	}, [finishEvent, openai, vocabulary, setting.openaiApiKey])
+
+	const handleRegenerateClick = useCallback(() => {
+		void generateDetail()
+	}, [generateDetail])
+
 	useEffect(() => {
 		if (!vocabulary) {
 			return
@@ -100,42 +142,8 @@ function VocabularyDetail(props: IVocabularyDetailProps): ReactElement {
 			return
 		}
 
-		const submit = async (): Promise<void> => {
-			setIsLoading(true)
-			setDetail('')
-			setError('')
-			try {
-				await openai.chatCompletion({
-					messages: [
-						{
-							role: 'system',
-							content: systemPrompt
-						},
-						{
-							role: 'user',
-							content: `###${vocabulary.word}###`
-						}
-					],
-					model: 'gpt-4.1-nano',
-					onContent: (content: string): void => {
-						setDetail(previousDetail => previousDetail + content)
-					},
-					onFinish: (): void => {
-						setIsLoading(false)
-						document.dispatchEvent(finishEvent)
-					},
-					temperature: GPT_TEMPERATURE
-				})
-			} catch (error_) {
-				const errorMessage = (error_ as Error).message
-				setDetail('')
-				setError(errorMessage)
-				setIsLoading(false)
-			}
-		}
-
-		void submit()
-	}, [finishEvent, openai, vocabulary, setting.openaiApiKey])
+		void generateDetail()
+	}, [generateDetail, vocabulary, setting.openaiApiKey])
 
 	useEffect(() => {
 		const listener = (): void => {
@@ -176,32 +184,45 @@ function VocabularyDetail(props: IVocabularyDetailProps): ReactElement {
 				}}
 				className='rounded-lg p-4 md:p-6'
 			>
-				<div className='mb-2 flex items-center gap-2'>
-					<Typography
-						variant='h4'
-						component='h2'
-						color='primary'
-						sx={{ fontWeight: 'bold' }}
-					>
-						{vocabulary.word}
-					</Typography>
-					<Tooltip title='Listen to pronunciation'>
-						<IconButton
-							onClick={handlePronounce}
-							disabled={isPlaying}
-							size='small'
-							color='secondary'
+				<div className='mb-2 flex items-center justify-between'>
+					<div className='flex items-center gap-2'>
+						<Typography
+							variant='h4'
+							component='h2'
+							color='primary'
+							sx={{ fontWeight: 'bold' }}
 						>
-							<VolumeUpIcon />
-						</IconButton>
-					</Tooltip>
+							{vocabulary.word}
+						</Typography>
+						<Tooltip title='Listen to pronunciation'>
+							<IconButton
+								onClick={handlePronounce}
+								disabled={isPlaying}
+								size='small'
+								color='secondary'
+							>
+								<VolumeUpIcon />
+							</IconButton>
+						</Tooltip>
+					</div>
+					{detail && !isLoading ? (
+						<Button
+							startIcon={<RefreshIcon />}
+							variant='outlined'
+							color='secondary'
+							size='small'
+							onClick={handleRegenerateClick}
+						>
+							Regenerate
+						</Button>
+					) : null}
 				</div>
 				{isLoading ? (
 					<div className='flex items-center gap-2 text-gray-600'>
 						<CircularProgress size={16} color='primary' />
 						<span>Generating detailed explanation...</span>
 					</div>
-				) : undefined}
+				) : null}
 			</Paper>
 
 			{error ? (
