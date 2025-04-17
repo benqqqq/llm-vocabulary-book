@@ -73,8 +73,16 @@ Choose one of the following formats:
 4. Word relationships exercise
 5. Short story using the vocabulary words
 
-Include clear instructions and make the activity interactive. 
-For cloze tests or exercises with specific answers, include an "ANSWERS" section at the end that's initially hidden.
+IMPORTANT FORMATTING INSTRUCTIONS:
+1. Mix up the order of vocabulary words in your exercise - never present them in the same order as I provided them.
+2. Include clear instructions and make the activity interactive.
+3. For exercises with specific answers, you MUST include an answers section at the end using this exact format:
+
+---ANSWERS_BEGIN---
+Your answer content here
+---ANSWERS_END---
+
+The markers must be on their own lines with exactly this format for proper rendering.
 
 Format your response using markdown. 
 Create an activity that's appropriate for the number and type of words provided.
@@ -230,9 +238,24 @@ export default function VocabularyReview({
 		if (!reviewContent) return ''
 
 		// Split the content into two parts: main content and answers
-		const parts = reviewContent.split('## ANSWERS')
-		let mainContent = parts[0]
-		const answers = parts.length > 1 ? `## ANSWERS${parts[1]}` : ''
+		const answersStartMarker = '---ANSWERS_BEGIN---'
+		const answersEndMarker = '---ANSWERS_END---'
+
+		// Find the answers section
+		const startIndex = reviewContent.indexOf(answersStartMarker)
+		const endIndex = reviewContent.indexOf(answersEndMarker)
+
+		let mainContent = reviewContent
+		let answers = ''
+
+		// Extract the answers section if it exists
+		if (startIndex !== -1 && endIndex !== -1 && endIndex > startIndex) {
+			mainContent = reviewContent.slice(0, startIndex)
+			answers = reviewContent.slice(
+				startIndex,
+				endIndex + answersEndMarker.length
+			)
+		}
 
 		// Make vocabulary words clickable in the main content
 		for (const vocab of vocabularyList) {
@@ -288,7 +311,7 @@ export default function VocabularyReview({
 						/>
 					</div>
 
-					{reviewContent.includes('## ANSWERS') && (
+					{reviewContent.includes('---ANSWERS_BEGIN---') && (
 						<Box display='flex' justifyContent='center' mt={4}>
 							<Button
 								variant='outlined'
