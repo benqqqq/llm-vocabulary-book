@@ -193,25 +193,56 @@ export default function VocabularyReview({
 		setShowAnswers(false)
 
 		try {
-			// Sort vocabulary by review count (least reviewed first), then by timestamp (most recent first for tiebreakers)
-			const sortedVocabulary = [...vocabularyList]
-				.sort((a, b) => {
-					// First compare by reviewCount (prioritize words with fewer reviews)
-					const aCount = a.reviewCount ?? 0
-					const bCount = b.reviewCount ?? 0
-					if (aCount !== bCount) {
-						return aCount - bCount
-					}
-					// If review count is the same, prioritize more recent words
-					return b.timestamp.getTime() - a.timestamp.getTime()
-				})
-				// Take only 5 words for the review
-				.slice(0, 5)
+			// Create a map to track review counts
+			const reviewCountGroups = new Map<number, IVocabulary[]>()
+
+			// Organize vocabulary by review count
+			for (const vocab of vocabularyList) {
+				const reviewCount = vocab.reviewCount ?? 0
+				const group = reviewCountGroups.get(reviewCount) ?? []
+				group.push(vocab)
+				reviewCountGroups.set(reviewCount, group)
+			}
+
+			// Get all unique review counts and sort them (lowest first)
+			const reviewCounts = [...reviewCountGroups.keys()].sort((a, b) => a - b)
+
+			// Select words starting from groups with lowest review count
+			const selectedVocabulary: IVocabulary[] = []
+			let remainingSlots = 5 // Take 5 words for review
+
+			for (const count of reviewCounts) {
+				if (remainingSlots <= 0) break
+
+				// Get words in this review count group
+				const wordsInGroup = reviewCountGroups.get(count) ?? []
+
+				// Create a shuffled copy of the group
+				const shuffledWords = [...wordsInGroup]
+
+				// Fisher-Yates shuffle algorithm
+				for (
+					let indexToShuffle = shuffledWords.length - 1;
+					indexToShuffle > 0;
+					indexToShuffle -= 1
+				) {
+					const randomIndex = Math.floor(Math.random() * (indexToShuffle + 1))
+					// Swap elements
+					const temporary = shuffledWords[indexToShuffle]
+					shuffledWords[indexToShuffle] = shuffledWords[randomIndex]
+					shuffledWords[randomIndex] = temporary
+				}
+
+				// Take words from this group, up to the remaining slots
+				const wordsToTake = Math.min(remainingSlots, shuffledWords.length)
+				selectedVocabulary.push(...shuffledWords.slice(0, wordsToTake))
+				remainingSlots -= wordsToTake
+			}
 
 			// Save the selected word IDs for tracking
-			const wordIds = sortedVocabulary.map(v => v.id)
+			const wordIds = selectedVocabulary.map(v => v.id)
 
-			const wordsList = sortedVocabulary.map(v => v.word).join(', ')
+			const wordsList = selectedVocabulary.map(v => v.word).join(', ')
 
 			let fullContent = ''
 
