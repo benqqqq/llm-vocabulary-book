@@ -6,6 +6,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { GPT_MODELS, useOpenAI } from '../../services/OpenAiContext'
 import { useSettingContext } from '../../services/SettingContext'
+import { THEME_COLORS } from '../../theme'
 import type { IVocabulary } from './types'
 
 interface IVocabularyReviewProps {
@@ -43,7 +44,14 @@ function CustomLink({
 			<button
 				type='button'
 				onClick={handleClick}
-				className='font-bold text-blue-600 hover:underline'
+				className='font-bold transition-colors duration-200 hover:underline'
+				style={{
+					border: 'none',
+					background: 'none',
+					padding: '0',
+					cursor: 'pointer',
+					color: THEME_COLORS.secondaryMain
+				}}
 				{...props}
 			>
 				{children}
@@ -51,7 +59,12 @@ function CustomLink({
 		)
 	}
 	return (
-		<a href={href} {...props}>
+		<a
+			href={href}
+			className='hover:underline'
+			style={{ color: THEME_COLORS.secondaryMain }}
+			{...props}
+		>
 			{children}
 		</a>
 	)
@@ -271,8 +284,17 @@ export default function VocabularyReview({
 
 	return (
 		<div className='space-y-4'>
-			<Paper elevation={0} className='bg-gray-50 p-4 md:p-6'>
-				<Typography variant='h5' component='h2' className='mb-4'>
+			<Paper
+				elevation={0}
+				className='rounded-lg p-4 md:p-6'
+				sx={{ backgroundColor: 'background.paper' }}
+			>
+				<Typography
+					variant='h5'
+					component='h2'
+					className='mb-4'
+					color='primary'
+				>
 					Vocabulary Review
 				</Typography>
 
@@ -302,7 +324,11 @@ export default function VocabularyReview({
 			</Paper>
 
 			{reviewContent ? (
-				<Paper elevation={0} className='p-4 md:p-6'>
+				<Paper
+					elevation={0}
+					className='rounded-lg p-4 md:p-6'
+					sx={{ backgroundColor: 'background.default' }}
+				>
 					<div className='prose prose-sm prose-gray max-w-none overflow-x-auto md:prose-base'>
 						{/* eslint-disable-next-line react/jsx-handler-names */}
 						<MarkdownRenderer
@@ -315,7 +341,7 @@ export default function VocabularyReview({
 						<Box display='flex' justifyContent='center' mt={4}>
 							<Button
 								variant='outlined'
-								color='primary'
+								color='secondary'
 								onClick={handleToggleAnswers}
 							>
 								{showAnswers ? 'Hide Answers' : 'Show Answers'}

@@ -1,7 +1,14 @@
 import AccessTimeIcon from '@mui/icons-material/AccessTime'
 import DeleteIcon from '@mui/icons-material/Delete'
 import SchoolIcon from '@mui/icons-material/School'
-import { Chip, IconButton, List, ListItemButton, Tooltip } from '@mui/material'
+import {
+	Chip,
+	IconButton,
+	List,
+	ListItemButton,
+	Tooltip,
+	Typography
+} from '@mui/material'
 import type { ReactElement } from 'react'
 import { useCallback, useMemo } from 'react'
 import type { IVocabulary } from './types'
@@ -83,11 +90,17 @@ export default function VocabularyList({
 				<ListItemButton
 					key={item.id}
 					onClick={handleVocabularyClick(item)}
-					className='group hover:bg-gray-50'
+					className='group'
 				>
 					<div className='flex flex-grow flex-col py-1'>
 						<div className='flex items-center justify-between'>
-							<span className='font-medium text-gray-900'>{item.word}</span>
+							<Typography
+								variant='body1'
+								className='font-medium'
+								color='primary'
+							>
+								{item.word}
+							</Typography>
 							<div className='flex items-center'>
 								{item.reviewCount ? (
 									<Tooltip title='Review count'>
@@ -115,6 +128,7 @@ export default function VocabularyList({
 						</div>
 						<div className='mt-1 flex items-center gap-1 text-xs text-gray-500'>
 							<AccessTimeIcon
+								color='secondary'
 								sx={{ fontSize: DAYS_PER_WEEK * ICON_SIZE_MULTIPLIER }}
 							/>
 							{formatDate(item.timestamp)}

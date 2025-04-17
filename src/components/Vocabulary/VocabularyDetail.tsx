@@ -5,7 +5,8 @@ import {
 	CircularProgress,
 	IconButton,
 	Paper,
-	Tooltip
+	Tooltip,
+	Typography
 } from '@mui/material'
 import type { ReactElement } from 'react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -162,24 +163,35 @@ function VocabularyDetail(props: IVocabularyDetailProps): ReactElement {
 				<IconButton
 					onClick={handleBackClick}
 					size='small'
-					className='text-gray-600'
 					aria-label='Back to list'
+					color='primary'
 				>
 					<ArrowBackIcon />
 				</IconButton>
 				<span className='ml-1 text-sm text-gray-600'>Back to list</span>
 			</div>
-			<Paper elevation={0} className='bg-gray-50 p-4 md:p-6'>
+			<Paper
+				elevation={0}
+				sx={{
+					backgroundColor: 'background.paper'
+				}}
+				className='rounded-lg p-4 md:p-6'
+			>
 				<div className='mb-2 flex items-center gap-2'>
-					<h2 className='m-0 text-2xl font-bold text-gray-900 md:text-3xl'>
+					<Typography
+						variant='h4'
+						component='h2'
+						color='primary'
+						sx={{ fontWeight: 'bold' }}
+					>
 						{vocabulary.word}
-					</h2>
+					</Typography>
 					<Tooltip title='Listen to pronunciation'>
 						<IconButton
 							onClick={handlePronounce}
 							disabled={isPlaying}
 							size='small'
-							className='text-gray-600 hover:text-gray-900'
+							color='secondary'
 						>
 							<VolumeUpIcon />
 						</IconButton>
@@ -187,7 +199,7 @@ function VocabularyDetail(props: IVocabularyDetailProps): ReactElement {
 				</div>
 				{isLoading ? (
 					<div className='flex items-center gap-2 text-gray-600'>
-						<CircularProgress size={16} />
+						<CircularProgress size={16} color='primary' />
 						<span>Generating detailed explanation...</span>
 					</div>
 				) : undefined}
@@ -200,7 +212,13 @@ function VocabularyDetail(props: IVocabularyDetailProps): ReactElement {
 			) : undefined}
 
 			{detail ? (
-				<Paper elevation={0} className='p-4 md:p-6'>
+				<Paper
+					elevation={0}
+					className='rounded-lg p-4 md:p-6'
+					sx={{
+						backgroundColor: 'background.default'
+					}}
+				>
 					<div className='prose prose-sm prose-gray max-w-none overflow-x-auto md:prose-base'>
 						<ReactMarkdown remarkPlugins={[remarkGfm]}>{detail}</ReactMarkdown>
 					</div>
