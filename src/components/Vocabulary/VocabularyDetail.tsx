@@ -2,6 +2,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import VolumeUpIcon from '@mui/icons-material/VolumeUp'
 import {
 	Alert,
+	ButtonBase,
 	CircularProgress,
 	IconButton,
 	Paper,
@@ -159,17 +160,15 @@ function VocabularyDetail(props: IVocabularyDetailProps): ReactElement {
 
 	return (
 		<div className='space-y-4'>
-			<div className='mb-2 flex items-center md:hidden'>
-				<IconButton
-					onClick={handleBackClick}
-					size='small'
-					aria-label='Back to list'
-					color='primary'
-				>
+			<ButtonBase
+				className='sticky top-0 z-10 mb-2 flex w-full items-center justify-start bg-white py-2 shadow-sm md:hidden'
+				onClick={handleBackClick}
+			>
+				<IconButton size='small' aria-label='Back to list' color='primary'>
 					<ArrowBackIcon />
 				</IconButton>
 				<span className='ml-1 text-sm text-gray-600'>Back to list</span>
-			</div>
+			</ButtonBase>
 			<Paper
 				elevation={0}
 				sx={{
