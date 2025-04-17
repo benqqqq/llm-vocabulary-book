@@ -11,6 +11,8 @@ import Setting from '../components/common/Setting'
 import { useSettingContext } from '../services/SettingContext'
 import { database } from '../storage/database'
 
+const MOBILE_BREAKPOINT = 768
+
 export default function Vocabulary(): ReactElement {
 	const [vocabularyList, setVocabularyList] = useState<IVocabulary[]>([])
 	const [selectedVocabulary, setSelectedVocabulary] = useState<IVocabulary>()
@@ -63,6 +65,14 @@ export default function Vocabulary(): ReactElement {
 					)
 					setSelectedVocabulary(newVocabulary)
 					setActiveTab('vocabulary')
+
+					// Show detail view and scroll to top on mobile
+					if (window.innerWidth < MOBILE_BREAKPOINT) {
+						setShowMobileDetail(true)
+						setTimeout(() => {
+							window.scrollTo({ top: 0, behavior: 'smooth' })
+						}, 100)
+					}
 				} else {
 					const newVocabularyData = {
 						word: text,
@@ -83,6 +93,14 @@ export default function Vocabulary(): ReactElement {
 					])
 					setSelectedVocabulary(newVocabulary)
 					setActiveTab('vocabulary')
+
+					// Show detail view and scroll to top on mobile
+					if (window.innerWidth < MOBILE_BREAKPOINT) {
+						setShowMobileDetail(true)
+						setTimeout(() => {
+							window.scrollTo({ top: 0, behavior: 'smooth' })
+						}, 100)
+					}
 				}
 			}
 
@@ -103,7 +121,7 @@ export default function Vocabulary(): ReactElement {
 		setActiveTab('vocabulary')
 
 		// On mobile, set the detail view as visible and scroll to it
-		if (window.innerWidth < 768) {
+		if (window.innerWidth < MOBILE_BREAKPOINT) {
 			setShowMobileDetail(true)
 			setTimeout(() => {
 				window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -170,6 +188,14 @@ export default function Vocabulary(): ReactElement {
 			if (vocabulary) {
 				setSelectedVocabulary(vocabulary)
 				setActiveTab('vocabulary')
+
+				// On mobile, set the detail view as visible and scroll to it
+				if (window.innerWidth < MOBILE_BREAKPOINT) {
+					setShowMobileDetail(true)
+					setTimeout(() => {
+						window.scrollTo({ top: 0, behavior: 'smooth' })
+					}, 100)
+				}
 			}
 		},
 		[vocabularyList]
