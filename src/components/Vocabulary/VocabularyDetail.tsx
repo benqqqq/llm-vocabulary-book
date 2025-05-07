@@ -33,6 +33,7 @@ Suppose you are an English teacher with a specialization in vocabulary instructi
 
 - The pronunciation of the word in the International Phonetic Alphabet (IPA) for American English.
 - The etymology or history of the word, linking it to a story or context to aid memory.
+- A section that breaks down the word into its root, prefix, suffix, or any compositional elements. Explain the meaning of each part and how they combine to form the word, to help the learner memorize and understand the word's structure.
 - The translation of the word into Mandarin Chinese (Taiwan), with nuances explained if applicable.
 - Example sentences showing the word in varied contexts, including one relatable to Taiwanese culture or experiences.
 - A list of similar words with brief explanations of their differences and appropriate usage.
