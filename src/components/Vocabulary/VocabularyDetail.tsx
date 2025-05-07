@@ -19,6 +19,7 @@ import remarkGfm from 'remark-gfm'
 import { useOpenAI } from '../../services/OpenAiContext'
 import { useSettingContext } from '../../services/SettingContext'
 import type { IVocabulary } from './types'
+import VocabularyChat from './VocabularyChat'
 
 interface IVocabularyDetailProps {
 	vocabulary: IVocabulary | undefined
@@ -159,91 +160,104 @@ function VocabularyDetail(props: IVocabularyDetailProps): ReactElement {
 		}
 	}, [detail, finishEvent, onDetailGenerated, vocabulary, error])
 
-	if (!vocabulary) {
+	// Helper function to render the main content
+	const renderContent = (): ReactElement => {
+		if (!vocabulary) {
+			return (
+				<div className='flex h-full items-center justify-center text-gray-500'>
+					Select a word from the list to view its details
+				</div>
+			)
+		}
+
 		return (
-			<div className='flex h-full items-center justify-center text-gray-500'>
-				Select a word from the list to view its details
+			<div className='space-y-4'>
+				<ButtonBase
+					className='sticky top-0 z-10 mb-2 flex w-full items-center justify-start bg-white py-2 shadow-sm md:hidden'
+					onClick={handleBackClick}
+				>
+					<IconButton size='small' aria-label='Back to list' color='primary'>
+						<ArrowBackIcon />
+					</IconButton>
+					<span className='ml-1 text-sm text-gray-600'>Back to list</span>
+				</ButtonBase>
+				<Paper
+					elevation={0}
+					sx={{
+						backgroundColor: 'background.paper'
+					}}
+					className='rounded-lg p-4 md:p-6'
+				>
+					<div className='mb-2 flex items-center gap-2'>
+						<Typography
+							variant='h4'
+							component='h2'
+							color='primary'
+							sx={{ fontWeight: 'bold' }}
+						>
+							{vocabulary.word}
+						</Typography>
+						<Tooltip title='Listen to pronunciation'>
+							<IconButton
+								onClick={handlePronounce}
+								disabled={isPlaying}
+								size='small'
+								color='secondary'
+							>
+								<VolumeUpIcon />
+							</IconButton>
+						</Tooltip>
+					</div>
+					{isLoading ? (
+						<div className='flex items-center gap-2 text-gray-600'>
+							<CircularProgress size={16} color='primary' />
+							<span>Generating detailed explanation...</span>
+						</div>
+					) : null}
+					{!isLoading && detail ? (
+						<Button
+							startIcon={<RefreshIcon />}
+							variant='outlined'
+							color='secondary'
+							size='small'
+							onClick={handleRegenerateClick}
+						>
+							Regenerate
+						</Button>
+					) : null}
+				</Paper>
+
+				{error ? (
+					<Alert severity='error' variant='outlined' className='bg-white'>
+						{error}
+					</Alert>
+				) : null}
+
+				{detail ? (
+					<Paper
+						elevation={0}
+						className='rounded-lg p-4 md:p-6'
+						sx={{
+							backgroundColor: 'background.default'
+						}}
+					>
+						<div className='prose prose-sm prose-gray max-w-none overflow-x-auto md:prose-base'>
+							<ReactMarkdown remarkPlugins={[remarkGfm]}>
+								{detail}
+							</ReactMarkdown>
+						</div>
+					</Paper>
+				) : null}
+
+				{/* Add the chat interface only if all conditions are met */}
+				{detail && !error ? (
+					<VocabularyChat vocabulary={{ ...vocabulary, detail }} />
+				) : null}
 			</div>
 		)
 	}
 
-	return (
-		<div className='space-y-4'>
-			<ButtonBase
-				className='sticky top-0 z-10 mb-2 flex w-full items-center justify-start bg-white py-2 shadow-sm md:hidden'
-				onClick={handleBackClick}
-			>
-				<IconButton size='small' aria-label='Back to list' color='primary'>
-					<ArrowBackIcon />
-				</IconButton>
-				<span className='ml-1 text-sm text-gray-600'>Back to list</span>
-			</ButtonBase>
-			<Paper
-				elevation={0}
-				sx={{
-					backgroundColor: 'background.paper'
-				}}
-				className='rounded-lg p-4 md:p-6'
-			>
-				<div className='mb-2 flex items-center gap-2'>
-					<Typography
-						variant='h4'
-						component='h2'
-						color='primary'
-						sx={{ fontWeight: 'bold' }}
-					>
-						{vocabulary.word}
-					</Typography>
-					<Tooltip title='Listen to pronunciation'>
-						<IconButton
-							onClick={handlePronounce}
-							disabled={isPlaying}
-							size='small'
-							color='secondary'
-						>
-							<VolumeUpIcon />
-						</IconButton>
-					</Tooltip>
-				</div>
-				{isLoading ? (
-					<div className='flex items-center gap-2 text-gray-600'>
-						<CircularProgress size={16} color='primary' />
-						<span>Generating detailed explanation...</span>
-					</div>
-				) : (detail ? (
-					<Button
-						startIcon={<RefreshIcon />}
-						variant='outlined'
-						color='secondary'
-						size='small'
-						onClick={handleRegenerateClick}
-					>
-						Regenerate
-					</Button>
-				) : undefined)}
-			</Paper>
-
-			{error ? (
-				<Alert severity='error' variant='outlined' className='bg-white'>
-					{error}
-				</Alert>
-			) : undefined}
-
-			{detail ? (
-				<Paper
-					elevation={0}
-					className='rounded-lg p-4 md:p-6'
-					sx={{
-						backgroundColor: 'background.default'
-					}}
-				>
-					<div className='prose prose-sm prose-gray max-w-none overflow-x-auto md:prose-base'>
-						<ReactMarkdown remarkPlugins={[remarkGfm]}>{detail}</ReactMarkdown>
-					</div>
-				</Paper>
-			) : undefined}
-		</div>
-	)
+	return renderContent()
 }
 
 VocabularyDetail.defaultProps = {
